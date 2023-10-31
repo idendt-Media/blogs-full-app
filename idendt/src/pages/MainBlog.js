@@ -7,51 +7,35 @@ import { Link } from 'react-router-dom';
 
 function MainBlog() {
 
-  const [blogPosts, setBlogPosts] = useState([]);
+
+
+
+  
 
   useEffect(() => {
     async function fetchBlogPosts() {
       try {
+        // const response = await axios.get('https://idendt-db.onrender.com/api/blog');
         const response = await axios.get('http://localhost:5000/api/blog');
         setBlogPosts(response.data);
+        console.log(response.data ,"vannuu mone");
       } catch (error) {
         console.error('Error:', error);
       }
     }
 
     fetchBlogPosts();
+    console.log(blogPosts ,"come onnn");
+
+
   }, []);
 
 
+
+
+
     useEffect(() => {
-      const cursor = document.querySelector('.cursor');
-      const cursorinner = document.querySelector('.cursor2');
-      const a = document.querySelectorAll('a');
-      // const specialSection = document.getElementById('special-section');
-  
-      const handleMouseMove = (e) => {
-        cursor.style.transform = `translate3d(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%), 0)`;
-        cursorinner.style.left = e.clientX + 'px';
-        cursorinner.style.top = e.clientY + 'px';
-      };
-  
-      const handleMouseDown = () => {
-        cursor.classList.add('click');
-        cursorinner.classList.add('cursorinnerhover');
-      };
-  
-      const handleMouseUp = () => {
-        cursor.classList.remove('click');
-        cursorinner.classList.remove('cursorinnerhover');
-      };
-  
-      const handleLinkMouseOver = () => {
-        cursor.classList.add('hover');
-      };
-  
-      const handleLinkMouseLeave = () => {
-        cursor.classList.remove('hover');
-      };
+
   
    
   
@@ -72,33 +56,25 @@ function MainBlog() {
           dropdown.style.display = 'none';
         });
       };
-  
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mousedown', handleMouseDown);
-      document.addEventListener('mouseup', handleMouseUp);
-  
-      a.forEach((item) => {
-        item.addEventListener('mouseover', handleLinkMouseOver);
-        item.addEventListener('mouseleave', handleLinkMouseLeave);
-      });
-  
 
-      const menuToggle = document.getElementById('menu-toggle');
-      menuToggle.addEventListener('touchstart', toggleDropdown);
-  
-      return () => {
-        // Clean up event listeners when the component unmounts
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mousedown', handleMouseDown);
-        document.removeEventListener('mouseup', handleMouseUp);
-        a.forEach((item) => {
-          item.removeEventListener('mouseover', handleLinkMouseOver);
-          item.removeEventListener('mouseleave', handleLinkMouseLeave);
-        });
-
-        menuToggle.removeEventListener('touchstart', toggleDropdown);
-      };
     }, []);
+
+
+    const [blogPosts, setBlogPosts] = useState([]);
+    const [hoveredPost, setHoveredPost] = useState(null)
+
+
+
+    const truncateContent = (content, postId) => {
+      if (hoveredPost !== postId) {
+        const words = content.split(" ");
+   
+          return words.slice(0, 50).join(" ") + "...";
+        
+      }
+      return content;
+    };
+    
   return (
     <div>
           
@@ -107,7 +83,7 @@ function MainBlog() {
           <header class="header p-2 lg:px-40">
     <nav>
       <div class="logo">
-        <Link to={"https://idendt.com"}><img src="assets/Mains/idendtLogo.png" class="header-logo" alt=""/></Link>
+        <Link to={"https://idendt.com"}><img src="/blogs/assets/Mains/idendtLogo.png" class="header-logo" alt=""/></Link>
       </div>
       <input type="checkbox" id="menu-toggle"/>
       <label for="menu-toggle" class="menu-icon" >&#9776;</label>
@@ -153,7 +129,7 @@ function MainBlog() {
 
             <div class="blog-box h-full  mt-20 ">
 
-                <img src="assets/blogs/Blog-poster-01-a.jpg" alt="" className='object-contain'/>
+            <img src="/blogs/assets/Blogs/Blog-poster-01-a.jpg" alt="" className='object-contain' />
 
             </div>
         </div>
@@ -172,19 +148,26 @@ function MainBlog() {
 
       <div class="card-section ">
         <div class="card-wrapper">
-          <div class="cards">
+          <div class="cards-main">
+
+
    
           {blogPosts.map((post) => (
 
 
             <div class="card-box" key={post._id}>
               <div class="image">
-                <img src={`http://localhost:5000/Blogs/${post.imageUrl}`} alt={post.title}/>
+              <img src={`https://idendt-db.onrender.com/Blogs/${post.imageUrl}`} alt={post.title}/>
+
+
+              {/* <img src={`https://idendt-db.onrender.com/public/Blogs/${post.imageUrl}`} alt={post.title} /> */}
+
               </div>
               <div class="texts">
                 <h1 class="card-head">{post.title}</h1>
-                <p class="card-para">{post.content}</p>
-                
+                <p className="card-para" onMouseEnter={() => setHoveredPost(post._id)} onMouseLeave={() => setHoveredPost(null)}>
+                    {hoveredPost === post._id ? post.content : truncateContent(post.content)}
+                  </p>                  
                 <button class="read-btn">            <Link to={`/sub/${post._id}`}>Read More</Link>
 </button>
 
@@ -198,16 +181,13 @@ function MainBlog() {
 
 
 
-
-
-          </div>
+          </div>s
         </div>
       </div>
 
       </main>
 
-      <div class="cursor"></div>
-      <div class="cursor2"></div>
+   
     
     </div>
   )

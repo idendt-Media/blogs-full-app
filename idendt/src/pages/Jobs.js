@@ -6,7 +6,6 @@ import PopupForm from '../components/popupForm';
 
 function Jobs() {
 
-  const [isOpen, setIsOpen] = useState(false);
 
 
     const [jobPosts, setJobPosts] = useState([]);
@@ -14,7 +13,7 @@ function Jobs() {
     useEffect(() => {
       async function fetchJobsPosts() {
         try {
-          const response = await axios.get('http://localhost:5000/api/job');
+          const response = await axios.get('https://idendt-db.onrender.com/api/job');
           setJobPosts(response.data);
           console.log(response.data);
         } catch (error) {
@@ -110,6 +109,18 @@ function Jobs() {
             }, []);
 
 
+
+            const [isOpen, setIsOpen] = useState(false);
+            const [selectedJob, setSelectedJob] = useState(null); // State to store the selected job name
+          
+          
+            // Function to handle the "Apply Now" button click
+            const handleApplyNowClick = (jobTitle) => {
+              setSelectedJob(jobTitle);
+              setIsOpen(true);
+            };
+
+
   return (
     <div className='flex-col justify-center gap-28'>
 
@@ -135,6 +146,8 @@ function Jobs() {
           </ul>
         </li>
         <li><a href="blog.html" onclick="closeMenu()"> <Link to={"/"}>Blogs</Link> </a></li>
+        <li><a href="./vertical1.html"><Link to={"/careers"}>Careers</Link></a></li>
+
 
         <li><a href="index.html#contact" onclick="closeMenu()"> <Link to={"https://idendt.com/#contact"}>Contact</Link> </a></li>
 
@@ -182,12 +195,12 @@ function Jobs() {
         <div>
         <button
           className="bg-[#C4C4C4] text-black w-[120px] h-[40px] rounded-lg"
-          onClick={() => setIsOpen(true)}
+          onClick={() =>handleApplyNowClick(job.title)}
         >
           Apply Now
         </button>        </div>
         </div>
-        <PopupForm isOpen={isOpen} setIsOpen={setIsOpen}  jobName={job.title} />
+        <PopupForm isOpen={isOpen} setIsOpen={setIsOpen} jobName={selectedJob} /> {/* Pass selectedJob as a prop */}
     </div>
     )
 

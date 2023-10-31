@@ -15,7 +15,7 @@ function BLog() {
   useEffect(() => {
     async function fetchBlogPosts() {
       try {
-        const response = await axios.get('http://localhost:5000/api/blog');
+        const response = await axios.get('https://idendt-db.onrender.com/api/blog');
         const matchingPost = response.data.find(post => post._id === postId);
         if (matchingPost) {
           setMatchedBlogPost(matchingPost);
@@ -117,7 +117,7 @@ function BLog() {
  <header class="header p-2 lg:px-40">
     <nav>
       <div class="logo">
-        <Link to={"https://idendt.com"}><img src="/assets/Mains/idendtLogo.png" class="header-logo" alt=""/></Link>
+        <Link to={"https://idendt.com"}><img src="/blogs/assets/Mains/idendtLogo.png" class="header-logo" alt=""/></Link>
       </div>
       <input type="checkbox" id="menu-toggle"/>
       <label for="menu-toggle" class="menu-icon" >&#9776;</label>
@@ -137,6 +137,9 @@ function BLog() {
         <li><a href="./vertical1.html"><Link to={"/careers"}>Careers</Link></a></li>
 
         <li><a href="index.html#contact" onclick="closeMenu()"> <Link to={"https://idendt.com/#contact"}>Contact</Link> </a></li>
+      <li ><a href="./vertical1.html" ><Link to={"/admin"} >Admin</Link></a></li>
+      {/* style={{ display: 'none' }} */}
+
 
 
       </ul>
@@ -163,7 +166,7 @@ function BLog() {
 
             <div class="blog-box-inner   ">
 
-                <img src={`http://localhost:5000/Blogs/${matchedBlogPost.imageUrl}`}  alt="" class="blogbanner"/>
+                <img src={`https://idendt-db.onrender.com/Blogs/${matchedBlogPost.imageUrl}`}  alt="" class="blogbanner"/>
 
             </div>
 
@@ -173,7 +176,7 @@ function BLog() {
         <div class="text-div py-20 flex flex-col gap-6">
   
             <h1 class="card-head">{matchedBlogPost.title}</h1>
-            <p class="card-para">{matchedBlogPost.fullContent}</p>
+            <p class="card-para whitespace-pre-line">{matchedBlogPost.fullContent}</p>
             
         </div>
         </div>
@@ -195,7 +198,10 @@ function BLog() {
             <div class="card"  key={post._id}>
 
                 <div class="image">
-                  <img src={`http://localhost:5000/Blogs/${post.imageUrl}`} alt=""/>
+                <Link to={`/sub/${post._id}`}>
+
+                  <img src={`https://idendt-db.onrender.com/Blogs/${post.imageUrl}`} alt=""/>
+                </Link>
                 </div>
                 <div class="texts">
                   <h1 class="card-head sub">{post.title}</h1>

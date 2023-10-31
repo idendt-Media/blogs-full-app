@@ -1,10 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-const PopupForm = ({ isOpen, setIsOpen ,jobName }) => {
+const PopupForm = ({ isOpen, setIsOpen, jobName }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phoneNumber: '',
+    qualification: '',
+    message: '',
+  });
+
   const togglePopup = () => {
     setIsOpen(!isOpen);
   };
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const submitForm = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch('http://localhost:5000/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        console.log('Email sent successfully');
+      } else {
+        console.error('Error sending email');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
   return (
     <div className={`fixed inset-0 z-10 ${isOpen ? 'block' : 'hidden'}`}>
       <div className="absolute inset-0 bg-gray-600 opacity-50"></div>
@@ -24,6 +59,7 @@ const PopupForm = ({ isOpen, setIsOpen ,jobName }) => {
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline bg-[#C4C4C4] placeholder-black"
                 type="text"
                 placeholder="Name"
+                onChange={handleChange}
               />
             </div>
             <div className="md:w-1/2">
@@ -32,6 +68,7 @@ const PopupForm = ({ isOpen, setIsOpen ,jobName }) => {
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline bg-[#C4C4C4] placeholder-black"
                 type="email"
                 placeholder="Email"
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -42,6 +79,7 @@ const PopupForm = ({ isOpen, setIsOpen ,jobName }) => {
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline bg-[#C4C4C4] placeholder-black"
                 type="text"
                 placeholder="Phone Number"
+                onChange={handleChange}
               />
             </div>
             <div className="md:w-1/2">
@@ -50,6 +88,7 @@ const PopupForm = ({ isOpen, setIsOpen ,jobName }) => {
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline bg-[#C4C4C4] placeholder-black"
                 type="text"
                 placeholder="Qualification"
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -59,20 +98,22 @@ const PopupForm = ({ isOpen, setIsOpen ,jobName }) => {
               className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline bg-[#C4C4C4] placeholder-black"
               rows="4"
               placeholder="Message"
+              onChange={handleChange}
             ></textarea>
           </div>
           <div className="mb-4">
            
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline bg-[#C4C4C4]"
-              type="file"
+              type="file" 
+              onChange={handleChange}code 
             />
           </div>
         </div>
         <div className="flex items-center justify-between">
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            type="submit"
+            type="submit" onClick={submitForm}
           >
             Apply Now
           </button>

@@ -40,6 +40,7 @@ function Admin() {
       data.append('fullContent', formData.fullContent);
       data.append('image', imageFile); // Add the image file to the form data
 
+      // await axios.post('https://idendt-db.onrender.com/api/blog', data, {
       await axios.post('http://localhost:5000/api/blog', data, {
         headers: {
           'Content-Type': 'multipart/form-data', // Set the content type to multipart/form-data

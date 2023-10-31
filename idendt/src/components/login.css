@@ -101,4 +101,7 @@
     border-radius: 20px;
   }
   
-  
+  .adressImg{
+    
+object-fit: contain;
+  }

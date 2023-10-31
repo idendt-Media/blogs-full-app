@@ -13,7 +13,7 @@ function DeleteJobs() {
 useEffect(() => {
     async function fetchJobsPosts() {
       try {
-        const response = await axios.get('http://localhost:5000/api/job');
+        const response = await axios.get('https://idendt-db.onrender.com/api/job');
         setJobPosts(response.data);
         console.log(response.data);
       } catch (error) {
@@ -37,7 +37,7 @@ useEffect(() => {
     }
 
     try {
-        const response = await fetch(`http://localhost:5000/api/job/${jobId}`, {
+        const response = await fetch(`https://idendt-db.onrender.com/api/job/${jobId}`, {
             method: 'DELETE',
         });
 

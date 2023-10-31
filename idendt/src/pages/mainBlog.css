@@ -318,16 +318,17 @@ position: relative;
       align-items: center;
   }
 
-  .cards{
+  .cards-main{
     width: 100%;
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+    gap: 50px;
   }
 
 
   .card-box{
-    width: 300px;
+    width: 350px;
 
     display: flex;
     flex-direction: column;
@@ -364,6 +365,7 @@ position: relative;
     /* height: 400px; */
   }
 
+  
 
 
 
