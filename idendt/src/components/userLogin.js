@@ -8,6 +8,7 @@ import "../App.css"
 function UserAuth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
 const  navigate = useNavigate()
 
@@ -38,6 +39,8 @@ const  navigate = useNavigate()
       // Handle successful login, e.g., redirect to another page
     } catch (error) {
       console.error('Login failed', error.response.data);
+      setError('Invalid email or password'); // Set the error message
+
       // Handle login failure, e.g., display an error message
     }
   };
@@ -60,6 +63,9 @@ const  navigate = useNavigate()
 </div>
 <div class="form flexbox-col px-10 sm:px-14 lg:px-40 ">
 
+{error && (
+                      <p className="text-red-500 pt-10">{error}</p>
+                    )}
   <div class="form-wrapper">
     <form id="form" >
       <div class="form-input-max">
@@ -85,14 +91,16 @@ type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} requ
       
  
 
-      <div class="form-input-max flexbox-left">
-        <div class="button-wrapper">
+      <div class="form-input-max flexbox-left ">
+        <div class="button-wrapper flex flex-col gap-10">
           <button id="form-button" onClick={handleLogin} class="button btn-primary">
             Submit
             <div class="btn-secondary"></div>
           </button>
+
+
           <Link to={"/signin"}>
-<button className='text-white' >sign up</button>
+<button id="form-button-new" className='text-white' >sign up</button>
 </Link>
         </div>
       </div>

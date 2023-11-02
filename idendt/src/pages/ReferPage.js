@@ -47,7 +47,7 @@ const ReferPage = () => {
     <div className=' bg-black h-[100vh]'>
       <HeaderDash />
 
-      <div className='flex flex-col gap-4 bg-black py-10 px-10 lg:px-40 w-full' >
+      <div className='flex flex-col gap-4 bg-black py-32 sm:py-10 px-10 sm:px-40 w-full' >
         <h1 className="text-[24px] sm:text-[60px] font-bold text-white">Refer and Earn</h1>
 
         <div className='flex flex-col sm:flex-row gap-2 w-full'>

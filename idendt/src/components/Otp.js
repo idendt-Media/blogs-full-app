@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { useLocation, useNavigate , Link} from 'react-router-dom';
 import axios from 'axios';
@@ -9,6 +9,23 @@ const Otp = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
+    const [authenticated, setAuthenticated] = useState(false);
+
+
+
+
+    useEffect(() => {
+    // Check if the user is authenticated
+    const userToken = localStorage.getItem("userdbtoken");
+
+    console.log(userToken ,"toik vadaa");
+    if (userToken) {
+      setAuthenticated(true);
+    } else {
+      // Redirect to login page if not authenticated
+      navigate("/userLogin");
+    }
+  }, [navigate]);
 
   const LoginUser = async (e) => {
     e.preventDefault();

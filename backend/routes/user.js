@@ -27,6 +27,44 @@ const transporter = nodemailer.createTransport({
     }
 })
 
+
+
+
+
+
+const jwt = require('jsonwebtoken');
+
+const authenticateToken = (req, res, next) => {
+    const token = req.header('Authorization');
+    if (!token) {
+        req.user = null;
+        return res.redirect('/userLogin'); // Redirect to login page if no token is present
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            req.user = null;
+            return res.redirect('/login'); // Redirect to login page if token verification fails
+        } else {
+            req.user = user;
+            next();
+        }
+    });
+};
+
+// module.exports = authenticateToken;
+
+
+
+
+
+
+
+
+
+
+
+
 // Update the signup route in `server.js`
 router.post('/signup', async (req, res) => {
   const { username, password, email, phone ,company,state,city} = req.body;
@@ -42,7 +80,9 @@ router.post('/signup', async (req, res) => {
       await newUser.save();
 
       // Generate and attach a JWT token
-      const token = await newUser.generateAuthtoken();
+      // const token = await newUser.generateAuthtoken();
+
+      const token = jwt.sign({ email: newUser.email, username: newUser.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
 
 
@@ -77,6 +117,9 @@ router.post('/signup', async (req, res) => {
       if (!passwordMatch) {
         return res.status(401).json({ error: 'Incorrect password' });
       }
+
+
+      const token = jwt.sign({ email: user.email, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
 
       const OTP = Math.floor(100000 + Math.random() * 900000);
@@ -178,7 +221,7 @@ console.log("login sucess");
 
 
 
-  router.post('/verify', async (req, res) => {
+  router.post('/verify',  async (req, res) => {
     const { email, otp } = req.body;
     // console.log("vanammmmmmm");
   
@@ -204,23 +247,6 @@ console.log("login sucess");
       return res.status(400).json({ error: "Invalid Details" });
     }
   });
-
-
-
-
-
-// // Define an API endpoint to fetch leads
-// router.get('/fetch-status', async (req, res) => {
-//   try {
-//     const leadsWithNullStatus = await Lead.find({ status: null });
-
-//     res.json(leadsWithNullStatus);
-//     console.log(leadsWithNullStatus, "leads with null status");
-//   } catch (error) {
-//     console.error('Error:', error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
 
 
 
@@ -278,35 +304,69 @@ router.get('/leads', async (req, res) => {
 
 
 
-  // API endpoint for submitting leads
-  router.post('/submit-lead', async (req, res) => {
-    const { businessname, note, country, phone, email, city, contact, state, service ,status} = req.body;
-
+router.post('/submit-lead', async (req, res) => {
+  const { businessname, note, country, phone, email, city, contact, state, service, status } = req.body;
 
   try {
-    const newLead = new Lead({
-      businessname,
-      note,
-      country,
-      phone,
-      email,
-      city,
-      contact,
-      state,
-      service,
-      status
-    });
+    // Check if a lead with the same email already exists
+    const existingLead = await Lead.findOne({ email });
 
-    await newLead.save();
+    if (existingLead) {
+      // If a lead exists, update it by pushing the new data into the submissions array
+      existingLead.submissions.push({
+        businessname,
+        note,
+        country,
+        phone,
+        email,
+        city,
+        contact,
+        state,
+        service,
+        status,
+      });
 
+      await sendEmail(
+        'idendtmedia@gmail.com', // <-- Provide the recipient email address here
+        'New Lead Submission',
+        // `A new lead has been submitted:\n\n${JSON.stringify(req.body, null, 2)}` +
+        `\nBusiness Name: ${businessname}\nNote: ${note}\nCountry: ${country}\nPhone: ${phone}\nEmail: ${email}\nCity: ${city}\nContact: ${contact}\nState: ${state}\nService: ${service}\nStatus: ${status}`
+      );
+      
 
-    // await sendEmail({
-    //   to: 'idendtmedia@gmail.com',
-    //   subject: 'New Lead Submission',
-    //   text: `A new lead has been submitted:\n\n${JSON.stringify(req.body, null, 2)}`,
-    // text: `A new lead has been submitted:\n\nBusiness Name: ${businessname}\nNote: ${note}\nCountry: ${country}\nPhone: ${phone}\nEmail: ${email}\nCity: ${city}\nContact: ${contact}\nState: ${state}\nService: ${service}\nStatus: ${status}`,
+      await existingLead.save();
 
-    // });
+      // Additional actions if needed, e.g., sending an email
+    } else {
+      // If a lead doesn't exist, create a new lead with the initial submission
+      const newLead = new Lead({
+        email,
+        submissions: [{
+          businessname,
+          note,
+          country,
+          phone,
+          email,
+          city,
+          contact,
+          state,
+          service,
+          status,
+        }],
+      });
+
+      await newLead.save();
+
+      await sendEmail(
+        'idendtmedia@gmail.com', // <-- Provide the recipient email address here
+        'New Lead Submission',
+        // `A new lead has been submitted:\n\n${JSON.stringify(req.body, null, 2)}` +
+        `\nBusiness Name: ${businessname}\nNote: ${note}\nCountry: ${country}\nPhone: ${phone}\nEmail: ${email}\nCity: ${city}\nContact: ${contact}\nState: ${state}\nService: ${service}\nStatus: ${status}`
+      );
+      
+
+      // Additional actions if needed, e.g., sending an email
+    }
 
     res.status(201).json({ message: 'Lead submitted successfully' });
   } catch (error) {
@@ -325,13 +385,21 @@ router.post('/update-lead-status/:leadId', async (req, res) => {
 
   try {
     const lead = await Lead.findById(leadId);
+    console.log(lead);
 
     if (!lead) {
       return res.status(404).json({ error: 'Lead not found' });
     }
 
-    lead.status = newStatus;
-    await lead.save();
+ // Find the correct submission by its _id
+ const submissionToUpdate = lead.submissions.find((submission) => submission._id.toString() === req.body.submissionId);
+
+ if (!submissionToUpdate) {
+   return res.status(404).json({ error: 'Submission not found' });
+ }
+
+ // Update the status of the found submission
+ submissionToUpdate.status = newStatus;    await lead.save();
 
     res.json({ message: 'Lead status updated successfully' });
   } catch (error) {
@@ -340,19 +408,43 @@ router.post('/update-lead-status/:leadId', async (req, res) => {
   }
 });
 
+// Remove the duplicate declaration of `sendEmail`
+async function sendEmail(to, subject, text) {
+  try {
+      // send mail with defined transport object
+      const info = await transporter.sendMail({
+          from: 'your-gmail-account@gmail.com',
+          to,
+          subject,
+          text,
+      });
 
-// async function sendEmail({ to, subject, text }) {
-  
-//   const mailOptionsNew = {
-//     from: 'your-gmail-account@gmail.com', // Replace with your Gmail email
-//     to,
-//     subject,
-//     text,
-//   };
+      console.log('Email sent: ', info.messageId);
+      return info;
+  } catch (error) {
+      console.error('Error sending email: ', error.message);
+      throw error; // Re-throw the error to handle it in the calling function
+  }
+}
 
-  // await transporter.sendMail(mailOptionsNew);
-// }
+// ... (rest of your code)
 
+
+
+
+// Handle the route for sending converted emails
+router.post('/send-converted-email', (req, res) => {
+  // Get the email address from the request
+  const { email } = req.body;
+  console.log(email);
+
+  // Additional logic if needed...
+
+  // Send the email
+  sendEmail(email, 'Subject: Converted Email', 'Your converted email content')
+    .then(() => res.status(200).send('Email sent successfully'))
+    .catch((error) => res.status(500).send(`Error sending email: ${error.message}`));
+});
   
 
 module.exports = router;

@@ -71,6 +71,7 @@
   .form-input {
     width: 100%;
     padding: 10px;
+    color: white;
     font-size: 1.22rem;
     border-radius: 10px;
     background-color: #212121;
@@ -84,6 +85,19 @@
     border: 2px solid var(--primary);
   }
   #form-button {
+    font-size: 1.22rem;
+    background-color: #C4C4C4;
+    width: 173px;
+    color: black;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    border-radius: 10px;
+    align-items: center;
+  }
+
+
+  #form-button-new {
     font-size: 1.22rem;
     background-color: #C4C4C4;
     width: 173px;
