@@ -1,5 +1,7 @@
 import React, { useState, useEffect} from 'react';
 import axios from 'axios';
+import baseUrl from './config'; // Adjust the path accordingly
+
 
 function DeleteJobs() {
 
@@ -13,7 +15,7 @@ function DeleteJobs() {
 useEffect(() => {
     async function fetchJobsPosts() {
       try {
-        const response = await axios.get('https://idendt-db.onrender.com/api/job');
+        const response = await axios.get(`${baseUrl}/api/job`);
         setJobPosts(response.data);
         console.log(response.data);
       } catch (error) {

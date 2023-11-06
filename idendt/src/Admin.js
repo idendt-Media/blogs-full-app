@@ -3,8 +3,10 @@ import axios from 'axios';
 import DeletJobs from './components/DeleteJobs';
 import  './admin.css';
 import { Link } from 'react-router-dom';
+import UpdateStatus from './components/updateStatus';
 
 
+import baseUrl from './components/config'; // Adjust the path accordingly
 
 
 function Admin() {
@@ -41,7 +43,7 @@ function Admin() {
       data.append('image', imageFile); // Add the image file to the form data
 
       // await axios.post('https://idendt-db.onrender.com/api/blog', data, {
-      await axios.post('http://localhost:5000/api/blog', data, {
+      await axios.post(`${baseUrl}/api/blog`, data, {
         headers: {
           'Content-Type': 'multipart/form-data', // Set the content type to multipart/form-data
         },
@@ -82,7 +84,7 @@ const handleSubmitJob = async (e) => {
     data.append('desc', jobData.desc);
     data.append('image', imageFileJob); // Add the image file to the form data
 
-    await axios.post('http://localhost:5000/api/job', data, {
+    await axios.post(`${baseUrl}/api/job`, data, {
       headers: {
         'Content-Type': 'multipart/form-data', // Set the content type to multipart/form-data
       },
@@ -275,7 +277,7 @@ const handleSubmitJob = async (e) => {
 
 
 
-
+<UpdateStatus/>
 
 
 

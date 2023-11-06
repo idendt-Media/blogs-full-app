@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import GridComponent from '../components/grid';
 import PopupForm from '../components/popupForm';
+import baseUrl from '../components/config'; // Adjust the path accordingly
 
 function Jobs() {
 
@@ -13,7 +14,7 @@ function Jobs() {
     useEffect(() => {
       async function fetchJobsPosts() {
         try {
-          const response = await axios.get('https://idendt-db.onrender.com/api/job');
+          const response = await axios.get(`${baseUrl}/api/job`);
           setJobPosts(response.data);
           console.log(response.data);
         } catch (error) {

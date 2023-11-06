@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useParams } from 'react-router-dom';
 import './blog.css';
+import baseUrl from '../components/config'; // Adjust the path accordingly
 
 function BLog() {
   const { postId } = useParams();
@@ -15,7 +16,7 @@ function BLog() {
   useEffect(() => {
     async function fetchBlogPosts() {
       try {
-        const response = await axios.get('https://idendt-db.onrender.com/api/blog');
+        const response = await axios.get(`${baseUrl}/api/blog`);
         const matchingPost = response.data.find(post => post._id === postId);
         if (matchingPost) {
           setMatchedBlogPost(matchingPost);
