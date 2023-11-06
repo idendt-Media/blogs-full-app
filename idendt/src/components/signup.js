@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import baseUrl from './config'; // Adjust the path accordingly
 
 import './login.css'; // Import the CSS file for styling
 import HeaderDash from './Header-D';
@@ -31,7 +32,7 @@ function UserAuth() {
 
       localStorage.setItem('userEmail', email);
 
-      const response = await axios.post('http://localhost:5000/signup', {
+      const response = await axios.post(`${baseUrl}/signup`, {
         username,
         password,
         email,
@@ -45,6 +46,8 @@ function UserAuth() {
 
       // If signup is successful, navigate to the login page
       if (response.data.message === 'Signup successful') {
+
+        const tocken= response.data.token
         navigate('/userLogin');
       } else {
         setErrorMessage('Signup failed. Please try again.');

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';  // Import Axios
 import HeaderDash from '../components/Header-D';
+import baseUrl from '../components/config'; // Adjust the path accordingly
+
 
 const ReferPage = () => {
   const [userEmail, setUserEmail] = useState('');
@@ -21,7 +23,7 @@ const ReferPage = () => {
           return;
         }
 
-        const response = await axios.get(`http://localhost:5000/leads?email=${storedEmail}`);  // Use Axios here
+        const response = await axios.get(`${baseUrl}/leads?email=${storedEmail}`);  // Use Axios here
         console.log('API Response:', response);
 
         if (!response.data || response.data.length === 0) {

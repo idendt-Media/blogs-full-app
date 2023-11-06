@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import HeaderDash from './Header-D';
+import baseUrl from './config'; // Adjust the path accordingly
+
 
 import "../App.css"
 
-function UserAuth() {
+function UserAuth({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -18,7 +20,7 @@ const  navigate = useNavigate()
     try {
 
 
-      const response = await axios.post('http://localhost:5000/login', { email, password });
+      const response = await axios.post(`${baseUrl}/login`, { email, password });
 
       localStorage.setItem('userEmail', email);
 
@@ -27,9 +29,17 @@ const  navigate = useNavigate()
 
       const data = response.data
 
+            const  tocken= response.data.token
 
-      if(data.message==="Login successful"){
+
+
+      if(data.message==="Login successful" && tocken){
         console.log(data, "vaadaa kannapa");
+
+        console.log(tocken , "jwt tocken");
+
+                onLogin(tocken);
+
         navigate("/otp",{state:email})
       }
 

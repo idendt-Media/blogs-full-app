@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import HeaderDash from '../components/Header-D';
+import baseUrl from '../components/config'; // Adjust the path accordingly
+
 
 import '../App.css';
 
@@ -15,7 +17,7 @@ function VerifiedLogin() {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:5000/login-user', {
+      const response = await axios.post(`${baseUrl}/login-user`, {
         email,
         password,
       });

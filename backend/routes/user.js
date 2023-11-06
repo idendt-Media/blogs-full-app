@@ -14,6 +14,9 @@ const User = require('../model/signup'); // Adjust the path accordingly
 const userotp = require("../model/userOtp");
 const Lead = require("../model/Leads");
 // const users = require("../model/userSchema");
+const jwt = require('jsonwebtoken');
+const { error } = require('console');
+const multer = require('multer');
 
 
 
@@ -30,27 +33,27 @@ const transporter = nodemailer.createTransport({
 
 
 
-
-
-const jwt = require('jsonwebtoken');
-
 const authenticateToken = (req, res, next) => {
-    const token = req.header('Authorization');
-    if (!token) {
-        req.user = null;
-        return res.redirect('/userLogin'); // Redirect to login page if no token is present
-    }
+  let authHeader = req.headers.authorization;
+  
+  if (authHeader === undefined) {
+    res.status(401).send({ error: "No token provided" });
+    return;  // Add return statement to exit the function if no token is provided
+  }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) {
-            req.user = null;
-            return res.redirect('/login'); // Redirect to login page if token verification fails
-        } else {
-            req.user = user;
-            next();
-        }
-    });
+  let token = authHeader.split(" ")[1];
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      res.status(500).send({ error: "Authentication failed" });
+    } else {
+      next();
+    }
+  });
 };
+
+module.exports = authenticateToken;
+
 
 // module.exports = authenticateToken;
 
@@ -82,13 +85,12 @@ router.post('/signup', async (req, res) => {
       // Generate and attach a JWT token
       // const token = await newUser.generateAuthtoken();
 
-      const token = jwt.sign({ email: newUser.email, username: newUser.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
 
 
 
       // Respond with the token and a success message
-      res.status(201).json({ user: newUser, token, message: 'Signup successful' });
+      res.status(201).json({ user: newUser,  message: 'Signup successful' });
   } catch (error) {
       // Handle errors appropriately
       console.error(error);
@@ -177,7 +179,7 @@ router.post('/signup', async (req, res) => {
                 })
             }
   
-      res.status(200).json({ message: 'Login successful' });
+      res.status(200).json({ message: 'Login successful', token});
     } catch (error) {
       console.error('Error in login:', error);
       res.status(500).json({ error: 'Internal Server Error' });    }
@@ -446,5 +448,65 @@ router.post('/send-converted-email', (req, res) => {
     .catch((error) => res.status(500).send(`Error sending email: ${error.message}`));
 });
   
+
+
+
+
+// Set up multer for handling file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+
+
+// Define the route for sending emails
+router.post('/send-email', upload.single('resume'), async (req, res) => {
+  try {
+    // Extract other form data
+    const { name, email, phoneNumber, qualification, message ,jobName} = req.body;
+
+    // Extract the resume file from the request
+    const resume = req.file;
+
+    // Check if a file is attached
+    if (!resume) {
+      return res.status(400).json({ error: 'No file attached' });
+    }
+
+    // Define the email content
+    const mailOptions = {
+      from: email,
+      to: 'recipient-email@example.com', // Replace with the recipient's email
+      subject: 'Job Application',
+      text: `
+      Applying for the post of: ${jobName}
+
+        Name: ${name}
+        Email: ${email}
+        Phone Number: ${phoneNumber}
+        Qualification: ${qualification}
+        Message: ${message}
+      `,
+      attachments: [
+        {
+          filename: 'resume.pdf', // Adjust the filename
+          content: resume.buffer,
+          encoding: 'base64',
+        },
+      ],
+    };
+
+    // Send the email
+    await transporter.sendMail(mailOptions);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error sending email:', error);
+    res.status(500).json({ success: false, error: 'Error sending email' });
+  }
+});
+
+
+
+
+
 
 module.exports = router;

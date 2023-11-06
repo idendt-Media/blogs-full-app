@@ -3,6 +3,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useLocation, useNavigate , Link} from 'react-router-dom';
 import axios from 'axios';
 import HeaderDash from './Header-D';
+import baseUrl from './config'; // Adjust the path accordingly
+
 
 const Otp = () => {
   const [otp, setOtp] = useState("");
@@ -45,7 +47,7 @@ const Otp = () => {
       };
 
       try {
-        const response = await axios.post('http://localhost:5000/verify', data);
+        const response = await axios.post(`${baseUrl}/verify`, data);
         console.log('Login successful', response.data);
 
         localStorage.setItem("userdbtoken", response.data.userToken);

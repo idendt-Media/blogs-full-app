@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import HeaderDash from '../components/Header-D';
 import axios from 'axios';
+
+import baseUrl from './config'; // Adjust the path accordingly
+
 function UpdateStatus() {
     const [data, setData] = useState([]);
       const [showFirst, setShowFirst] = useState(null);
@@ -25,7 +28,7 @@ function UpdateStatus() {
     useEffect(() => {
       async function fetchSubmittedData() {
         try {
-          const response = await axios.get('http://localhost:5000/submited-data');
+          const response = await axios.get(`${baseUrl}/submited-data`);
           setData(response.data);
           
          
@@ -42,7 +45,7 @@ function UpdateStatus() {
     
     const updateStatusOnBackend = async (leadId, submissionId, newStatus) => {
       try {
-        await axios.post(`http://localhost:5000/update-lead-status/${leadId}`, { submissionId, newStatus });
+        await axios.post(`${baseUrl}/update-lead-status/${leadId}`, { submissionId, newStatus });
       } catch (error) {
         console.error('Error updating status:', error);
         // Set state to handle the error
@@ -53,7 +56,7 @@ function UpdateStatus() {
 
   const sendConvertedEmail = async (email) => {
     try {
-      const response = await fetch('http://localhost:5000/send-converted-email', {
+      const response = await fetch(`${baseUrl}/send-converted-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

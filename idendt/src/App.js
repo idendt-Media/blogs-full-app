@@ -18,10 +18,19 @@ import Status from './pages/status';
 import UpdateStatus from './components/updateStatus';
 import Sales from './pages/sales';
 import VerifiedLogin from './pages/verifiedLogin';
+import { AuthProvider } from './components/AuthContext'; // Update the path
+
 
 function App() {
+  const [token, setToken] = useState(localStorage.getItem('jwtToken'));
 
+  const handleLogintoken = (newToken) => {
+    setToken(newToken);
+    localStorage.setItem('jwtToken', newToken);
 
+  };
+
+  console.log(token , " app js jwt");
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -36,9 +45,16 @@ function App() {
     setIsAuthenticated(false);
   };
 
+    // ProtectedRoute component to handle access to protected routes
+    const ProtectedRoute = ({ element }) => {
+      return token ? element : <Navigate to="/userLogin" />;
+    };
+  
+
   return (
 
-    
+    <AuthProvider>
+
     <Router basename="/blogs">
       <Routes>
         <Route path="/inner/:postId" element={<New />} />
@@ -60,21 +76,24 @@ function App() {
         <Route path="/sub/:postId" element={<Sub />} />
         <Route path="/careers" element={<Sample />} />
         <Route path="/" element={<Main />} exact />
-        <Route path="/userLogin" element={<UserAuth />}  />
+        <Route path="/userLogin" element={<UserAuth onLogin={handleLogintoken} />}  />
         <Route path="/signin" element={<UserSignin/>}  />
-        <Route path="/otp" element={<Otp/>}  />
-        <Route path="/refer" element={<ReferPage/>}  />
-        <Route path="/lead-submit" element={<LeadSubmit/>}  />
-        <Route path="/view-status" element={<ViewStatus/>}  />
-        <Route path="/data-submitted" element={<StatusCheck/>}  />
-        <Route path="/status/:leadId" element={<Status />} />
-        <Route path="/us" element={<UpdateStatus/>} />
-        <Route path="/sales" element={<Sales/>} />
-        <Route path="/verifiedLogin" element={<VerifiedLogin/>} />
+
+        <Route path="/otp" element={<ProtectedRoute element={<Otp/>} />} />
+        <Route path="/refer" element={<ProtectedRoute element={<ReferPage />} />} />
+        <Route path="/lead-submit" element={<ProtectedRoute element={<LeadSubmit />} />} />
+        <Route path="/view-status" element={<ProtectedRoute element={<ViewStatus />} />} />
+        <Route path="/data-submitted" element={<ProtectedRoute element={<StatusCheck />} />} />
+        <Route path="/status/:leadId" element={<ProtectedRoute element={<Status />} />} />
+        <Route path="/us" element={<ProtectedRoute element={<UpdateStatus />} />} />
+        <Route path="/sales" element={<ProtectedRoute element={<Sales />} />} />
+        <Route path="/verifiedLogin" element={<ProtectedRoute element={<VerifiedLogin />} />} />
         
 
       </Routes>
     </Router>
+    </AuthProvider>
+
   );
 }
 

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import HeaderDash from '../components/Header-D';
 import axios from 'axios';
 import { Link } from 'react-router-dom'
+import baseUrl from '../components/config'; // Adjust the path accordingly
+
 
 
 function StatusCheck() {
@@ -10,7 +12,7 @@ function StatusCheck() {
   useEffect(() => {
     async function fetchSubmittedData() {
       try {
-        const response = await axios.get('http://localhost:5000/submited-data');
+        const response = await axios.get(`${baseUrl}/submited-data`);
         setData(response.data);
         console.log(response.data ,"data mon");
       } catch (error) {
